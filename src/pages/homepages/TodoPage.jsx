@@ -1,17 +1,24 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { getAllTodos, updateTodo } from "../../services/TodoServices";
 import { addTodo } from "../../services/TodoServices";
 import { markasCompletedDb } from "../../services/TodoServices";
 import { deleteTodo } from "../../services/TodoServices";
+import { currentuser } from "../../services/AuthService";
 import { toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
 import FloatingButton from "../../components/home/FloatingButton";
-import FormDialogbox from "../../components/home/EditForm";
 import EditForm from "../../components/home/EditForm";
+import TodoItem from "../../components/home/Todoitem";
+import { useOutletContext } from "react-router-dom";
+
 export default function TodoPage() {
+
+  const { isDarkMode, setIsDarkMode } = useOutletContext();
   const [todos, setTodo] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [editTodo, setEditTodo] = useState("");
+  const [currentUser, setCurrentUser] = useState("");
+
 
   useEffect(() => {
     const fetchTodos = async () => {
@@ -31,8 +38,20 @@ export default function TodoPage() {
       }
     };
 
+    const getCurrent = () => {
+      const user = currentuser();
+      if (user !== null) {
+        setCurrentUser(user);
+      }
+    };
+
+    
+
+    getCurrent();
     fetchTodos();
   }, []);
+
+ 
 
   const todoSubmit = async (text) => {
     if (text.trim() !== "") {
@@ -59,22 +78,19 @@ export default function TodoPage() {
 
   const markasCompleted = (index) => {
     setTodo((prev) =>
-      prev.map(
-        (todo, i) => {
-          if (i === index) {
-            handeCompleted(todo.todo_id, !todo.completed);
-            return { ...todo, completed: !todo.completed };
-          }
-          return todo;
+      prev.map((todo, i) => {
+        if (i === index) {
+          handeCompleted(todo.todo_id, !todo.completed);
+          return { ...todo, completed: !todo.completed };
         }
-        // i === index ? { ...todo, completed: !todo.completed }  : todo
-      )
+        return todo;
+      })
     );
   };
 
   const handeCompleted = async (todo_id, isCompleted) => {
     try {
-      const response = await markasCompletedDb(todo_id, isCompleted);
+      await markasCompletedDb(todo_id, isCompleted);
     } catch (error) {
       toast.error(error);
     }
@@ -109,7 +125,7 @@ export default function TodoPage() {
 
   const handleEditDb = async (editedTodo) => {
     setTodo((prev) =>
-      prev.map((todo, i) => {
+      prev.map((todo) => {
         if (todo.todo_id === editedTodo.todo_id) {
           return { ...todo, task: editedTodo.task };
         }
@@ -124,77 +140,71 @@ export default function TodoPage() {
     }
   };
 
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-8 px-4 sm:px-6 lg:px-8">
+    <div className={`
+      min-h-screen 
+      ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gradient-to-br from-blue-50 to-blue-100'}
+      py-8 px-4 sm:px-6 lg:px-8
+    `}>
       <div className="max-w-2xl mx-auto">
+        {/* User Display and Dark Mode Toggle */}
+        <div className="flex justify-between items-center mb-6">
+          {currentUser && (
+            <div className={`
+              text-lg font-semibold
+              ${isDarkMode ? 'text-gray-200' : 'text-blue-800'}
+            `}>
+              Welcome, {currentUser}
+            </div>
+          )}
+          <button 
+            onClick={toggleDarkMode}
+            className={`
+              px-4 py-2 rounded-full transition-colors duration-300
+              ${isDarkMode 
+                ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600' 
+                : 'bg-blue-100 text-blue-800 hover:bg-blue-200'}
+            `}
+          >
+            {isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
+          </button>
+        </div>
+
         <header className="mb-6">
-          <h1 className="text-4xl font-extrabold text-center text-blue-800 tracking-tight">
+          <h1 className={`
+            text-4xl font-extrabold text-center tracking-tight
+            ${isDarkMode ? 'text-white' : 'text-blue-800'}
+          `}>
             Todo List
           </h1>
         </header>
 
-        <section className="bg-white shadow-xl rounded-lg overflow-hidden">
+        <section className={`
+          shadow-xl rounded-lg overflow-hidden
+          ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white'}
+        `}>
           {todos.length > 0 ? (
-            <ul className="divide-y divide-gray-200">
+            <ul className={`divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-gray-200'}`}>
               {todos.map((todo, index) => (
-                <li
-                  key={todo.todo_id}
-                  className={`px-6 py-4 flex items-center justify-between transition-colors duration-300 
-                    ${
-                      todo.completed
-                        ? "bg-gray-100 text-gray-500"
-                        : "hover:bg-blue-50"
-                    }`}
-                >
-                  <p
-                    className={`text-lg flex-grow pr-4 ${
-                      todo.completed ? "line-through" : ""
-                    }`}
-                  >
-                    {todo.task}
-                  </p>
-                  <div className="flex items-center space-x-3">
-                    <button
-                      onClick={() => handleEdit(index)}
-                      className="text-red-500 hover:text-red-700 transition-colors duration-200 hover:bg-red-100 p-2 rounded-full"
-                    >
-                      Edit
-                    </button>
-                    <input
-                      type="checkbox"
-                      checked={todo.completed}
-                      onChange={() => markasCompleted(index)}
-                      className="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
-                    />
-                    <button
-                      onClick={() => handleDelete(index)}
-                      className="text-red-500 hover:text-red-700 transition-colors duration-200 hover:bg-red-100 p-2 rounded-full"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </li>
+                <TodoItem index={index} handleDelete={handleDelete} handleEdit={handleEdit} key={todo.todo_id} todo={todo} markasCompleted={markasCompleted} isDarkMode={isDarkMode}/>
+                
               ))}
             </ul>
           ) : (
-            <div className="text-center py-10 text-gray-500">
+            <div className={`
+              text-center py-10 
+              ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}
+            `}>
               <p className="text-xl">No todos yet. Add a new task!</p>
             </div>
           )}
         </section>
 
-        <FloatingButton toSubmit={todoSubmit} />
+        <FloatingButton theme={isDarkMode} toSubmit={todoSubmit} />
 
         <EditForm
           task={editTodo}

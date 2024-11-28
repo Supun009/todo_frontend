@@ -1,4 +1,6 @@
 import axiosInstance from "./AxiosInsance";
+import {jwtDecode} from 'jwt-decode';
+
 
 export const login = async (email, password) => {
   try {
@@ -45,5 +47,25 @@ export const signup = async (email, username, password) => {
     }
   }
 };
-export const currentuser = (username, password) =>
-  axiosInstance.post("/auth/currentuser", { username, password });
+export const currentuser = () =>{
+  const token = localStorage.getItem("jwttoken");
+  
+  if (!token) {
+    return null;
+  } else {
+    try {
+
+      const decodedToken = jwtDecode(token); 
+
+      const email = decodedToken?.username;
+
+      if (!email) return null;
+      return email;
+  } catch (error) {
+      console.error("Invalid token", error);
+      return null;
+  }
+  
+  }
+}
+ 

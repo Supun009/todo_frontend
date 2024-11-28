@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 function FloatingButton(props) {
+  const { theme = "true" } = props; // Default to "light" mode
   const [isOpen, setIsOpen] = useState(false);
   const todoRef = useRef(null);
   const formRef = useRef(null);
@@ -40,7 +41,7 @@ function FloatingButton(props) {
     <div className="fixed bottom-6 right-6 z-50">
       {/* Floating Button */}
       <button
-        className="
+        className={`
           floating-button 
           w-16 h-16 
           bg-gradient-to-br from-pink-500 to-orange-400 
@@ -56,7 +57,7 @@ function FloatingButton(props) {
           transform 
           hover:scale-110 
           active:scale-95
-        "
+        `}
         onClick={() => setIsOpen(true)}
       >
         <svg
@@ -80,9 +81,9 @@ function FloatingButton(props) {
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
           <div 
             ref={formRef}
-            className="
+            className={`
               relative
-              bg-white 
+              ${theme ? "bg-gray-800 text-white" : "bg-white text-gray-800"} 
               rounded-xl 
               shadow-2xl 
               w-96 
@@ -92,19 +93,18 @@ function FloatingButton(props) {
               duration-300 
               scale-100 
               opacity-100
-            "
+            `}
           >
             {/* Close Button */}
             <button
               onClick={handleClose}
-              className="
+              className={`
                 absolute 
                 top-4 
                 right-4 
-                text-gray-500 
-                hover:text-gray-800 
+                ${theme ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-800"} 
                 transition-colors
-              "
+              `}
             >
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -124,25 +124,24 @@ function FloatingButton(props) {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
-              <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">
+              <h2 className="text-2xl font-bold text-center mb-4">
                 Add New Item
               </h2>
               <input
                 type="text"
                 ref={todoRef}
-                className="
+                className={`
                   w-full 
                   p-3 
                   border-2 
-                  border-gray-300 
+                  ${theme ? "border-gray-600 bg-gray-700 text-white" : "border-gray-300"} 
                   rounded-lg 
                   focus:outline-none 
                   focus:ring-2 
-                  focus:ring-pink-500 
-                  focus:border-transparent 
+                  ${theme ? "focus:ring-pink-400 focus:border-transparent" : "focus:ring-pink-500 focus:border-transparent"} 
                   transition-all 
                   duration-300
-                "
+                `}
                 placeholder="Enter your text here"
               />
               <button

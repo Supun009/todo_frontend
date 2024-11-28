@@ -18,10 +18,6 @@ const ProtectedRoute = ()=> {
             return false;
         }
     })();
-    console.log(isAuthenticated);
-
-    // const isAuthenticated = true;
-
     return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace/>;
 };
 
