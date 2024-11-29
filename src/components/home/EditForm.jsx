@@ -1,30 +1,30 @@
 import React, { useRef, useEffect, useState } from "react";
 
-function EditForm({ isOpen, onClose, onSubmit, task }) {
+function EditForm({ isOpen, onClose, onSubmit, task, isDarkMode }) {
   const formRef = useRef(null);
-  const [todoValue, setTodoValue] = useState(task?.task || ""); // Initialize local state
+  const [todoValue, setTodoValue] = useState(task?.task || "");
 
   const handleInputChange = (e) => {
-    setTodoValue(e.target.value); // Update local state when user types
+    setTodoValue(e.target.value);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const trimmedValue = todoValue.trim(); // Remove leading/trailing spaces
+    const trimmedValue = todoValue.trim();
     if (!trimmedValue) {
       alert("Todo cannot be empty or just spaces!");
       return;
     }
 
-    onSubmit({ ...task, task: trimmedValue }); // Pass updated task to parent
-    setTodoValue(""); // Clear local state after submission
-    onClose(); // Close the form
+    onSubmit({ ...task, task: trimmedValue });
+    setTodoValue("");
+    onClose();
   };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (formRef.current && !formRef.current.contains(event.target)) {
-        onClose(); // Close if clicking outside
+        onClose();
       }
     };
 
@@ -38,20 +38,29 @@ function EditForm({ isOpen, onClose, onSubmit, task }) {
   }, [isOpen, onClose]);
 
   useEffect(() => {
-    setTodoValue(task?.task || ""); // Update local state when the task prop changes
+    setTodoValue(task?.task || "");
   }, [task]);
 
   if (!isOpen) {
-    return null; // Render nothing if the form is not open
+    return null;
   }
+
+  // Define theme-based styles
+  const backgroundClass = isDarkMode ? "bg-gray-800 text-gray-200" : "bg-white text-gray-800";
+  const inputClass = isDarkMode
+    ? "bg-gray-700 border-gray-600 text-gray-200 focus:ring-gray-500"
+    : "bg-white border-gray-300 text-gray-800 focus:ring-pink-500";
+  // const buttonClass = isDarkMode
+  //   ? "bg-gradient-to-r from-gray-700 to-gray-500"
+  //   : "bg-gradient-to-r from-pink-500 to-orange-400";
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
       <div
         ref={formRef}
-        className="
-          relative
-          bg-white 
+        className={`
+          relative 
+          ${backgroundClass}
           rounded-xl 
           shadow-2xl 
           w-96 
@@ -61,7 +70,7 @@ function EditForm({ isOpen, onClose, onSubmit, task }) {
           duration-300 
           scale-100 
           opacity-100
-        "
+        `}
       >
         {/* Close Button */}
         <button
@@ -71,7 +80,7 @@ function EditForm({ isOpen, onClose, onSubmit, task }) {
             top-4 
             right-4 
             text-gray-500 
-            hover:text-gray-800 
+            hover:text-gray-300 
             transition-colors
           "
         >
@@ -93,36 +102,32 @@ function EditForm({ isOpen, onClose, onSubmit, task }) {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">
-            Edit Item
+          <h2 className="text-2xl font-bold text-center mb-4">
+            Edit ToDo
           </h2>
           <input
             type="text"
-            value={todoValue} // Controlled input
-            onChange={handleInputChange} // Update local state on input change
-            className="
+            value={todoValue}
+            onChange={handleInputChange}
+            className={`
               w-full 
               p-3 
               border-2 
-              border-gray-300 
               rounded-lg 
               focus:outline-none 
-              focus:ring-2 
-              focus:ring-pink-500 
               focus:border-transparent 
               transition-all 
               duration-300
-            "
+              ${inputClass}
+            `}
             placeholder="Enter your text here"
           />
           <button
             type="submit"
-            className="
+            className={`
               w-full 
               py-3 
-              bg-gradient-to-r 
-              from-pink-500 
-              to-orange-400 
+              bg-gradient-to-r from-pink-500 to-orange-400
               text-white 
               rounded-lg 
               hover:opacity-90 
@@ -131,7 +136,7 @@ function EditForm({ isOpen, onClose, onSubmit, task }) {
               font-semibold 
               uppercase 
               tracking-wider
-            "
+            `}
           >
             Submit
           </button>

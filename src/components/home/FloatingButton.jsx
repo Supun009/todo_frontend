@@ -125,7 +125,7 @@ function FloatingButton(props) {
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <h2 className="text-2xl font-bold text-center mb-4">
-                Add New Item
+                Add New ToDo
               </h2>
               <input
                 type="text"

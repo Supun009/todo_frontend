@@ -36,17 +36,14 @@ export const signup = async (email, username, password) => {
       username,
       password,
     });
-    if (response.status == 201) {
-      return "201";
-    }
-  } catch (error) {
-    if (error.response) {
-      return error.response.data.message;
-    } else {
-      return "Something went wrong";
+    console.log(response)
+   return response;
+  } catch (error) {  
+      console.log(error.response.data.message) ;
+      return error;
     }
   }
-};
+
 export const currentuser = () =>{
   const token = localStorage.getItem("jwttoken");
   

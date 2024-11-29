@@ -34,11 +34,21 @@ export default function SignUpPage() {
       errors.email = "Please enter a valid email";
     }
 
-    if (!username || username.trim() === "" || username.length < 3 || username.length > 20) {
+    if (
+      !username ||
+      username.trim() === "" ||
+      username.length < 3 ||
+      username.length > 20
+    ) {
       errors.username = "Please enter a valid username";
     }
 
-    if (!password || password.length < 6 || password.trim() === "" || password.length > 20) {
+    if (
+      !password ||
+      password.length < 6 ||
+      password.trim() === "" ||
+      password.length > 20
+    ) {
       errors.password =
         "Please enter a stronge password Password should be at least 6 characters long";
     }
@@ -60,16 +70,11 @@ export default function SignUpPage() {
   };
 
   const handleSignUp = async (data) => {
-    try {
-      const response = await signup(data.email, data.username, data.password);
-      if (response == "201") {
-        navigate("/login", { replace: true });
-        
-      } else {
-        toast.error(response);
-      }
-    } catch (error) {
-      console.log(error);
+    const response = await signup(data.email, data.username, data.password);
+    if (response.status === 201) {
+      toast.success(response.data.message);
+    } else {
+      toast.error(response.response.data.message);
     }
   };
 
@@ -151,7 +156,7 @@ export default function SignUpPage() {
                 "
               />
 
-              <AuthButton 
+              <AuthButton
                 buttonName="Login"
                 className="
                   w-full 
@@ -173,8 +178,8 @@ export default function SignUpPage() {
               <div className="text-center space-y-4">
                 <p className="text-gray-600">
                   New here?{" "}
-                  <Link 
-                    to="/login" 
+                  <Link
+                    to="/login"
                     className="
                       text-pink-500 
                       hover:text-orange-400 

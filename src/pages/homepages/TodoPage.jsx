@@ -207,6 +207,7 @@ export default function TodoPage() {
         <FloatingButton theme={isDarkMode} toSubmit={todoSubmit} />
 
         <EditForm
+          isDarkMode={isDarkMode}
           task={editTodo}
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
